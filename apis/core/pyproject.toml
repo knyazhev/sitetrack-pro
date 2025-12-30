@@ -1,0 +1,24 @@
+[project]
+name = "tooltrack-core"
+version = "0.1.0"
+description = "Core API for ToolTrack"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.32.0",
+    "sqlalchemy>=2.0.36",
+    "psycopg2-binary>=2.9.10",
+    "alembic>=1.14.0",
+    "python-dotenv>=1.0.1",
+    "pydantic-settings>=2.6.1",
+    "python-multipart>=0.0.17",
+    "redis>=5.2.1",
+    "pytest>=8.3.4"
+]
+
+[tool.setuptools]
+py-modules = []
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
