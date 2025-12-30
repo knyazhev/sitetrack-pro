@@ -1,0 +1,13 @@
+FROM node:20-alpine AS build
+WORKDIR /workspace
+COPY package.json package-lock.json ./
+COPY apps apps
+COPY libs libs
+RUN npm ci --workspace @tooltrack/pwa
+RUN npm run build --workspace @tooltrack/pwa
+
+FROM node:20-alpine
+WORKDIR /app
+COPY --from=build /workspace/apps/pwa/dist ./dist
+RUN npm install -g serve
+CMD ["serve", "-s", "dist", "-l", "4173"]

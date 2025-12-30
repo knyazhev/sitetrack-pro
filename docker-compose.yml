@@ -1,0 +1,56 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16
+    container_name: tooltrack_db
+    environment:
+      POSTGRES_USER: tooltrack
+      POSTGRES_PASSWORD: tooltrack
+      POSTGRES_DB: tooltrack
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  api:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile.api
+    env_file:
+      - .env
+    environment:
+      TT_DATABASE_URL: ${TT_DATABASE_URL:-postgresql+psycopg2://tooltrack:tooltrack@db:5432/tooltrack}
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:8000:8000"
+    restart: unless-stopped
+
+  pwa:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile.pwa
+    environment:
+      VITE_API_URL: http://localhost/api
+    ports:
+      - "127.0.0.1:4173:4173"
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile.web
+    environment:
+      VITE_API_URL: http://localhost/api
+    ports:
+      - "127.0.0.1:4174:4174"
+    restart: unless-stopped
+
+volumes:
+  db_data:
